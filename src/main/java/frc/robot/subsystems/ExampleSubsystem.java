@@ -109,8 +109,10 @@ public class ExampleSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     
-    //runs the motors and 1 speed and talon at 0.2% speed when A button pressed
-    //to launch the ball and move the rest up at the same time
+    /*
+    runs the motors at 1 speed and talon at 0.2% speed when A button pressed
+    to launch the ball and run the talon to move the next ball up at the same time
+    */
 
     //if the A button is pressed and the motor isn't already running,
     //start the timer and change the boolean running to true
@@ -136,25 +138,24 @@ public class ExampleSubsystem extends SubsystemBase {
     }
     
     
+    /*
+    runs talon if the lower IR sensor detects a ball and the upper IR sensor does not,
+    //moving the balls up as they enter, as well as making sure that they don't fall out of the robot
+    */
 
     //if the talon isn't already running, the lower IR sensor detects a ball, and the upper IR sensor doesn't
-    //detect a ball that's close, set the boolean running to true and start the timer
+    //detect a ball, set the boolean running to true
     if(!running_t && ir0.get() > 0.4 && ir2.get() < 0.4) {
       running_t = true;
-      timer_t.start();
     }
-    //if the boolean running is true, run the motors at 0.2 speed
+    //if the boolean running is true, run the talon at 0.2 speed
     else if(running_t) {
       talon.set(ControlMode.PercentOutput, -0.1);
     }
-    //if the boolean running is true and and the timer has been running for 2 seconds,
-    //stop and reset the timer, set running to false, and stop the motors
-    else if(running_t && timer_t.hasElapsed(2)) {
-      timer_t.stop();
-      timer_t.reset();
+    //if the boolean running is true and and the upper IR sensor detects a ball,
+    //set running to false and stop the talon
+    else if(running_t && ir2.get() > 0.4) {
       running_t = false;
-      motor.set(0);
-      motor2.set(0);
     }
   
   }
